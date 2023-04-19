@@ -1,75 +1,67 @@
-import fs from 'fs';
-import inquirer from 'inquirer';
+const inquirer = require('inquirer');
+const fs = require('fs');
 
-const questions = [
-    {
-        type: 'input',
-        name: 'name',
-        message: 'What is your name?',
-        validate: (response) => {
-            if (response === '') {
-                return 'Your name is required'
-            }
-            return true;
-        }
-    },
-    {
-        type: 'input',
-        name: 'name',
-        message: "Which state do you live in?",
-        validate: (response) => {
-            if (response === '') {
-                return 'Your state is required'
-            }
-            return true;
-        }
-    },
-    {
-        type: 'input',
-        name: 'email',
-        message: "Enter our email",
-        validate: (response) => {
-            if (response === '') {
-                return 'Your email is required'
-            }
+const generateHTML = (answers) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>${answers.name}'s Profile</title>
+        <style>
+          body {
+            font-family: sans-serif;
+          }
+          h1 {
+            color: #0077b5;
+          }
+          /* Add more CSS styles here */
+        </style>
+      </head>
+      <body>
+        <h1>${answers.name}</h1>
+        <p>Location: ${answers.location}</p>
+        <p>Bio: ${answers.bio}</p>
+        <p>LinkedIn: <a href="${answers.linkedin}" target="_blank">${answers.linkedin}</a></p>
+        <p>GitHub: <a href="${answers.github}" target="_blank">${answers.github}</a></p>
+      </body>
+    </html>
+  `;
+};
 
-            return true;
-        }
+inquirer
+  .prompt([
+    {
+      type: 'input',
+      name: 'name',
+      message: "What's your name?",
     },
     {
-        type: 'input',
-        name: 'bio',
-        message: 'Write a few sentences describing yourself for a "bio"',
-        validate: (response) => {
-            if (response === '') {
-                return 'A bio is required'
-            }
-
-            return true;
-        }
+      type: 'input',
+      name: 'location',
+      message: 'Where are you located?',
     },
     {
-        type: 'input',
-        name: 'github',
-        message: "What is your GitHub username?",
-        validate: (response) => {
-            if (response === '') {
-                return 'GitHub username is required'
-            }
-
-            return true;
-        }
+      type: 'input',
+      name: 'bio',
+      message: 'Tell us a little about yourself:',
     },
     {
-        type: 'input',
-        name: 'linkedin',
-        message: "What is your Linkedin username?",
-        validate: (response) => {
-            if (response === '') {
-                return '';
-            }
-
-            return true;
-        }
+      type: 'input',
+      name: 'linkedin',
+      message: 'What is your LinkedIn URL?',
     },
-]
+    {
+      type: 'input',
+      name: 'github',
+      message: 'What is your GitHub URL?',
+    },
+  ])
+  .then((answers) => {
+    fs.writeFile('profile.html', generateHTML(answers), (err) => {
+      if (err) throw err;
+      console.log('Your profile has been saved to profile.html');
+    });
+  })
+  .catch((error) => {
+    console.error(error);
+  });
